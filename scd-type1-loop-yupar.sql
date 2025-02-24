@@ -13,6 +13,8 @@ BEGIN
     
     var_start_date := DATEADD(DAY, 1, var_base_max_date);
 
+    -- changes 
+
     -- Loop through dates
     WHILE var_start_date <= var_data_date LOOP
 
@@ -20,7 +22,7 @@ BEGIN
         DELETE FROM base.market_category
         USING dl_processed.market_category
         WHERE 
-            dl_processed.market_category.day_key::DATE = var_start_date
+            dl_processed.market_category.day_key::DATE = var_start_date     
             AND base.market_category.level1_category_id = dl_processed.market_category.level1_category_id
             AND base.market_category.level2_category_id = dl_processed.market_category.level2_category_id
             AND base.market_category.level3_category_id = dl_processed.market_category.level3_category_id
