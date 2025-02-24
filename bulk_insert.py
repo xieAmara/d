@@ -1,4 +1,3 @@
-
 import sys
 import boto3
 from awsglue.transforms import *
@@ -11,7 +10,6 @@ from pyspark.sql.functions import year, month, lit
 from pytz import timezone
 from awsglue.dynamicframe import DynamicFrame 
 from pyspark.sql.functions import col
-
   
 sc = SparkContext.getOrCreate()
 glueContext = GlueContext(sc)
