@@ -30,7 +30,7 @@ AS $$
     FROM 
         staging.kbzpay_market s
     WHERE (t.level_3_category_id = s.level_3_category_id AND t.level_1_category_id = s.level_1_category_id AND t.level_2_category_id = s.level_2_category_id)
-     AND (t.status <> s.status);
+    AND (t.status <> s.status);
     
     -- insert new values 
     INSERT INTO base.kbzpay_market (

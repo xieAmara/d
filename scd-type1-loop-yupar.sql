@@ -12,9 +12,7 @@ BEGIN
     -- Get max date from base table
     
     var_start_date := DATEADD(DAY, 1, var_base_max_date);
-
-    -- changes 
-
+    
     -- Loop through dates
     WHILE var_start_date <= var_data_date LOOP
 
