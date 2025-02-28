@@ -7,7 +7,8 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from datetime import datetime, timedelta
-from pyspark.sql.functions import year, month, lit
+from pyspark.sql.functions import year, month, lit, when, regexp_replace
+from pyspark.sql.types import StringType 
 from pytz import timezone
 from awsglue.dynamicframe import DynamicFrame 
 from pyspark.sql.functions import col
@@ -54,12 +55,28 @@ if 'Contents' in response:
             df = spark.read.options(**custom_options).csv(s3_path)
             filename = s3_path.split("/")[-1].split(".")[0]
             date = filename[-8:]
-            date_obj = datetime.strptime(date, '%d%m%Y')
+            date_obj = datetime.strptime(date, '%Y%m%d')
             prev_day = date_obj - timedelta(days=1)
 
             day_key = prev_day.strftime('%Y%m%d') 
             month_key = prev_day.strftime('%Y%m') 
             year_key = prev_day.strftime('%Y')
+            
+            
+            df = df.select([
+                regexp_replace(col(c), r'[\n\r]+', ' ').alias(c) for c in df.columns
+            ])
+            
+            df = df.select([
+                regexp_replace(col(c), r'\s+', ' ').alias(c) for c in df.columns
+            ])
+            
+            df = df.select([
+                regexp_replace(col(c), r'[\r\n\f\v\u0085\u2028\u2029]+', ' ').alias(c) for c in df.columns
+            ])
+            
+            if "col4" in df.columns: 
+                df = df.drop("col4")
 
             df = df \
             .withColumn("file_name", lit(filename))\
@@ -69,21 +86,24 @@ if 'Contents' in response:
 
             # Set default values if the columns are not present 
 
-            if "source" not in df.columns: 
-                df = df.withColumn("source", lit("Mobile Phone"))
-            if "role" not in df.columns:
-                df = df.withColumn("role", lit("Customer"))
-
+            if "Source" not in df.columns and "source" not in df.columns: 
+                df = df.withColumn("source", lit(None))
+            if "Role" not in df.columns and "role" not in df.columns:
+                df = df.withColumn("role",lit(None))
+                    
+                
             df = DynamicFrame.fromDF(df, glueContext, "dynamic_frame")
+            s3_client = boto3.client("s3")
             s3_bucket = "acoe-silver-layer"
             s3_prefix = f"market_customerlogin/processed/year_key={year_key}/month_key={month_key}/day_key={day_key}/"
             
             changecolumnname_node = ApplyMapping.apply(
                 frame=df,
                 mappings=[
-                    ("customer name", "string", "customer_name", "string"), 
+                    ("customer id", "string", "customer_id", "string"),
                     ("phone number", "string", "phone_number", "string"), 
-                    ("customer id", "string", "customer_id", "string")
+                    ("customer name", "string", "customer_name", "string"),
+                    ("login time", "string", "login_time", "timestamp"),
                     ("source", "string", "source", "string"),
                     ("role", "string", "role", "string"),  
                     ("file_name", "string","file_name", "string"),
