@@ -73,10 +73,10 @@ data1 = """202000000002518816,09450111587,DAW IN
 DAW TIN TIN NWE,2022-11-09 15:12:26
 202000000002518816,09450111587,DAW IN
 
-DAW TIN TIN NWE,2022-11-09 15:12:25"""
+DAW TIN TIN NWE,    """
 
 def remove_line_break(data):
-    line_list = data.splitlines()   
+    line_list = data.splitlines()       
     final = []
     combined = ""
 
