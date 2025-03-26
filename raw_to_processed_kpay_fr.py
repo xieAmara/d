@@ -139,12 +139,12 @@ for year, month, day, file_path in date_keys:
     df.show(10)
     
     all_columns = df.columns 
-    if sorted(all_columns) == sorted(expected_columns) and len(all_columns) == len(expected_columns):
-        df = df.withColumn(
-            "impact_phone", 
-            F.regexp_replace("impact_phone", '"', '')  
-        )
-        
+    try:
+        if sorted(all_columns) != sorted(expected_columns) or len(all_columns) != len(expected_columns):
+            raise ValueError("Columns do not match")
+
+        df = df.withColumn("impact_phone", F.regexp_replace("impact_phone", '"', ''))  
+
         df = df.withColumn(
             "impact_phone", 
             F.when(
@@ -152,7 +152,7 @@ for year, month, day, file_path in date_keys:
                 F.concat(F.lit('{"impact_phone_json":["'), F.col("impact_phone"), F.lit('"]}'))
             ).otherwise(None)  
         )
-        
+
         df = df.withColumn(
             "first_related_phone", 
             F.when(
@@ -160,7 +160,7 @@ for year, month, day, file_path in date_keys:
                 F.concat(F.lit('{"first_related_phone_json":['), F.col("first_related_phone"), F.lit(']}'))
             ).otherwise(None)
         )
-        
+
         df = df.withColumn(
             "second_related_phone", 
             F.when(
@@ -168,9 +168,17 @@ for year, month, day, file_path in date_keys:
                 F.concat(F.lit('{"second_related_phone_json":['), F.col("second_related_phone"), F.lit(']}'))
             ).otherwise(None)
         )
-        
+
+        df = df.withColumn(
+            "third_related_phone", 
+            F.when(
+                ~F.isnan("third_related_phone"),
+                F.concat(F.lit('{"third_related_phone_json":['), F.col("third_related_phone"), F.lit(']}'))
+            ).otherwise(None)
+        )
+
         df = DynamicFrame.fromDF(df, glueContext, "dynamic_frame")
-        
+
         s3_bucket = "acoe-silver-layer"
         s3_prefix = f"kpay_fr/processed/year_key={year_key}/month_key={month_key}/day_key={day_key}/"
         delete_s3_files(s3_bucket, s3_prefix)
@@ -181,14 +189,18 @@ for year, month, day, file_path in date_keys:
             updateBehavior="UPDATE_IN_DATABASE", 
             partitionKeys=["year_key", "month_key", "day_key"], 
             enableUpdateCatalog=True, 
-            transformation_ctx="AmazonS3_node1730101467610")
-        
+            transformation_ctx="AmazonS3_node1730101467610"
+        )
+
         AmazonS3_node1730101467610.setCatalogInfo(catalogDatabase="database_test", catalogTableName="kpay_fraud")
         AmazonS3_node1730101467610.setFormat("glueparquet", compression="snappy")
         AmazonS3_node1730101467610.writeFrame(df)
 
-    else:
-        print("columns does not match")
-        break
+    except ValueError as e:
+        sys.exit(1) 
+
+    except Exception as e:
+        sys.exit(1) 
+
     
 job.commit()

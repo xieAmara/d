@@ -1,0 +1,141 @@
+[
+    {
+      "Name": "case_no",
+      "Type": "string"
+    },
+    {
+      "Name": "fraud_incident_from_date",
+      "Type": "date"
+    },
+    {
+      "Name": "fraud_incident_to_date",
+      "Type": "date"
+    },
+    {
+      "Name": "fraud_discover_date",
+      "Type": "date"
+    },
+    {
+      "Name": "fmu_fraud_discover_date",
+      "Type": "date"
+    },
+    {
+      "Name": "description",
+      "Type": "string"
+    },
+    {
+      "Name": "how_detected",
+      "Type": "string"
+    },
+    {
+      "Name": "ticket_number",
+      "Type": "string"
+    },
+    {
+      "Name": "investigation_team",
+      "Type": "string"
+    },
+    {
+      "Name": "fraud_category",
+      "Type": "string"
+    },
+    {
+      "Name": "fraud_type",
+      "Type": "string"
+    },
+    {
+      "Name": "initial_loss_amount_mmk",
+      "Type": "string"
+    },
+    {
+      "Name": "recovery_amount_mmk",
+      "Type": "string"
+    },
+    {
+      "Name": "net_loss_amount_mmk",
+      "Type": "string"
+    },
+    {
+      "Name": "trends",
+      "Type": "string"
+    },
+    {
+      "Name": "fraudster_group",
+      "Type": "string"
+    },
+    {
+      "Name": "status",
+      "Type": "string"
+    },
+    {
+      "Name": "status_update",
+      "Type": "string"
+    },
+    {
+      "Name": "latest_update",
+      "Type": "string"
+    },
+    {
+      "Name": "assigned_to_followup",
+      "Type": "string"
+    },
+    {
+      "Name": "impact_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "first_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "second_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "third_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "fourth_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "fifth_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "sixth_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "seventh_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "eighth_related_phone",
+      "Type": "string"
+    },
+    {
+      "Name": "fraud_pattern_name",
+      "Type": "string"
+    },
+    {
+      "Name": "remark",
+      "Type": "string"
+    },
+    {
+      "Name": "year_key",
+      "Type": "string",
+      "PartitionKey": "Partition (0)"
+    },
+    {
+      "Name": "month_key",
+      "Type": "string",
+      "PartitionKey": "Partition (1)"
+    },
+    {
+      "Name": "day_key",
+      "Type": "string",
+      "PartitionKey": "Partition (2)"
+    }
+  ]
