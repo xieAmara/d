@@ -241,3 +241,42 @@ def remove_line_break(data):
 remove_line_break(to_csv(isLineBreak(df)))
 job.commit()
     
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+df_cleaned = df_cleaned.withColumn("row_id", F.monotonically_increasing_id())
+
+# Create lag columns for the next row's values
+df_cleaned = df_cleaned.withColumn("next_customerid", F.lead("Customer Id", 1).over(Window.orderBy("row_id"))) \
+.withColumn("next_phonenumber", F.lead("Phone number", 1).over(Window.orderBy("row_id"))) \
+.withColumn("next_customername", F.lead("Customer Name", 1).over(Window.orderBy("row_id"))) \
+.withColumn("next_logintime", F.lead("Login Time", 1).over(Window.orderBy("row_id")))
+                                
+        
+# Clean the columns by shifting values
+df_cleaned = df_cleaned.withColumn(
+    "Customer Name",
+    F.when(
+        (F.col("Login Time").isNull()) &
+        (F.col("next_customername").isNull()) &
+        (F.col("next_logintime").isNull()),
+        F.concat(F.col("Customer Name"), F.lit(" "), F.col("next_customerid"))
+    ).otherwise(F.col("Customer Name"))
+)
+
+df_cleaned = df_cleaned.withColumn(
+    "Login Time",
+    F.when(
+        (F.col("Login Time").isNull()) &
+        (F.col("next_customername").isNull()) &
+        (F.col("next_logintime").isNull()),
+        F.col("next_phonenumber")
+    ).otherwise(F.col("Login Time"))
+)
+
+# Drop the row_id and other temporary columns
+df_cleaned = df_cleaned.drop("row_id", "next_customerid", "next_phonenumber", "next_logintime", "next_customername")
+
+# Drop the columns that were fixed
+df_cleaned = df_cleaned.filter(
+    ~(F.col("Customer Name").isNull() & F.col("Login Time").isNull())
+)
